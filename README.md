@@ -1,0 +1,2 @@
+# MTGDecks
+For hobby purposes
