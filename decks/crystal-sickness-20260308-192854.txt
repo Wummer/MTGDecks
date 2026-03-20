@@ -1,0 +1,115 @@
+1 Academy Ruins
+1 Aether Spellbomb
+1 An Offer You Can't Refuse
+1 Arcane Denial
+1 Arcane Signet
+1 Archway of Innovation
+1 Baleful Strix
+1 Basim Ibn Ishaq
+1 Blood Fountain
+1 Chrome Mox
+1 Cloud Key
+1 Command Beacon
+1 Command Tower
+1 Cryogen Relic
+1 Crystal Skull, Isu Spyglass
+1 Darksteel Citadel
+1 Darkwater Catacombs
+1 Demonic Junker
+1 Dimir Aqueduct
+1 Dimir Signet
+1 Efficient Construction
+1 Enhanced Surveillance
+1 Etherium Sculptor
+1 Executioner's Capsule
+1 Fellwar Stone
+1 Fierce Guardianship
+1 Flare of Denial
+1 Flare of Malice
+1 Fomori Vault
+1 Forensic Gadgeteer
+1 Geier Reach Sanitarium
+1 Gloomlake Verge
+1 Inventors' Fair
+1 Island
+1 Krark-Clan Ironworks
+1 Liberator, Urza's Battlethopter
+1 Liquimetal Torque
+1 Lórien Revealed
+1 Lotus Petal
+1 Mana Drain
+1 Master of Etherium
+1 Matoya, Archon Elder
+1 Meekstone
+1 Merata, Neuron Hacker
+1 Minamo, School at Water's Edge
+1 Mirrodin Besieged
+1 Mishra's Bauble
+1 Mistvault Bridge
+1 Morphic Pool
+1 Mox Amber
+1 Mox Opal
+1 Mystic Forge
+1 Nimblewright Schematic
+1 Obsessive Pursuit
+1 Otawara, Soaring City
+1 Phyrexian Dreadnought
+1 Polluted Delta
+1 Ponder
+1 Preordain
+1 Prized Statue
+1 Retrofitter Foundry
+1 Riddlesmith
+1 Sai, Master Thopterist
+1 Seat of the Synod
+1 Servo Schematic
+1 Shipwreck Marsh
+1 Skullclamp
+1 Sojourner's Companion
+1 Sol Ring
+1 Soul-Guide Lantern
+1 Spire of Industry
+1 Springleaf Drum
+1 Street Wraith
+1 Stridehangar Automaton
+1 Sunken Ruins
+1 Swamp
+1 Talisman of Dominance
+1 Tezzeret, Cruel Captain
+1 Tezzeret, Master of the Bridge
+1 The Mechanist, Aerial Artisan
+1 The Mightstone and Weakstone
+1 The One Ring
+1 The Underworld Cookbook
+1 Thought Monitor
+1 Thoughtcast
+1 Tithing Blade
+1 Toxic Deluge
+1 Treasure Vault
+1 Troll of Khazad-dûm
+1 Undercity Sewers
+1 Underground River
+1 Underground Sea
+1 Urza, Lord High Artificer
+1 Urza's Bauble
+1 Urza's Saga
+1 Uthros Research Craft
+1 Uthros, Titanic Godcore
+1 Vault of Whispers
+1 Watery Grave
+
+SIDEBOARD:
+1 Chromatic Star
+1 Crucible of Worlds
+1 Entomb
+1 Filigree Attendant
+1 Jeweled Amulet
+1 Phyrexian Metamorph
+1 Repurposing Bay
+1 Requiem Monolith
+1 Souls of the Lost
+1 The Regalia
+1 Thieving Skydiver
+1 Unshakable Tail
+
+1 Golbez, Crystal Collector

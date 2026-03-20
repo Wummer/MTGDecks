@@ -1,0 +1,91 @@
+1 Arcane Signet
+1 Arid Mesa
+1 Bayo, Irritable Instructor
+1 Big Score
+1 Birgi, God of Storytelling
+1 Black Mage's Rod
+1 Black Market Connections
+1 Black Waltz No. 3
+1 Blazemire Verge
+1 Blood Crypt
+1 Bloodstained Mire
+1 Chaos Warp
+1 Circle of Power
+1 City on Fire
+1 Command Tower
+1 Cornered by Black Mages
+1 Coruscation Mage
+1 Dance with Calamity
+1 Dark Ritual
+1 Dawn Warriors' Legacy
+1 Deadly Dispute
+1 Deadly Rollick
+1 Demand Answers
+1 Dragonskull Summit
+1 Emergence Zone
+1 Ensnared by the Mara
+1 Faithless Looting
+1 Fellwar Stone
+1 Fire Covenant
+1 Graven Cairns
+1 Harmonic Prodigy
+1 Haunted Ridge
+1 Highway Robbery
+1 Jeska's Will
+1 Kaya's Ghostform
+1 Light Up the Stage
+1 Lightning Greaves
+1 Lindblum, Industrial Regency
+1 Lively Dirge
+1 Luxury Suite
+1 Malakir Rebirth
+1 Mana Geyser
+1 Marsh Flats
+1 Midgar, City of Mako
+8 Mountain
+1 Necropotence
+1 Night's Whisper
+1 Not Dead After All
+1 Overmaster
+1 Phyrexian Tower
+1 Polluted Delta
+1 Price of Progress
+1 Primal Amulet
+1 Rakdos Signet
+1 Reanimate
+1 Redirect Lightning
+1 Return the Favor
+1 Roaming Throne
+1 Ruby Medallion
+1 Saw in Half
+1 Scalding Tarn
+1 Sign in Blood
+1 Smoldering Marsh
+1 Snuff Out
+1 Sol Ring
+1 Storm-Kiln Artist
+1 Stormsplitter
+1 Summon: G.F. Cerberus
+6 Swamp
+1 Talisman of Indulgence
+1 Unexpected Windfall
+1 Untimely Malfunction
+1 Urabrask
+1 Urborg, Tomb of Yawgmoth
+1 Valakut Awakening
+1 Vandalblast
+1 Vivi's Persistence
+1 Withering Torment
+1 Wooded Foothills
+
+SIDEBOARD:
+1 Aphotic Wisps
+1 Bloodsoaked Insight
+1 Descent into Avernus
+1 Mages' Contest
+1 Risky Shortcut
+1 Siege Smash
+1 Tibalt's Trickery
+1 Transpose
+
+1 Kuja, Genome Sorcerer

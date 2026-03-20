@@ -1,0 +1,113 @@
+1 Afterlife from the Loam
+1 An Offer You Can't Refuse
+1 Arcane Signet
+1 Assassin's Trophy
+1 Azusa, Lost but Seeking
+1 Beast Within
+1 Bojuka Bog
+1 Boseiju, Who Endures
+1 Breeding Pool
+1 Cephalid Coliseum
+1 Command Beacon
+1 Command Tower
+1 Conduit of Worlds
+1 Counterspell
+1 Craterhoof Behemoth
+1 Crop Rotation
+1 Crucible of Worlds
+1 Darkwater Catacombs
+1 Dauthi Voidwalker
+1 Dread Return
+1 Dreamroot Cascade
+1 Drownyard Temple
+1 Eternal Witness
+1 Exotic Orchard
+1 Expedition Map
+1 Exploration
+1 Exsanguinate
+1 Farseek
+1 Fetid Pools
+1 Field of the Dead
+1 Fierce Guardianship
+1 Final Parting
+4 Forest
+1 Frantic Search
+1 Golgari Rot Farm
+1 Grapple with the Past
+1 Gravecrawler
+1 Harrow
+1 Hedron Crab
+1 Heroic Intervention
+1 Hinterland Harbor
+3 Island
+1 Jarad, Golgari Lich Lord
+1 Lethal Scheme
+1 Life from the Loam
+1 Lightning Greaves
+1 Living Death
+1 Llanowar Wastes
+1 Lord of Extinction
+1 Meren of Clan Nel Toth
+1 Misty Rainforest
+1 Morphic Pool
+1 Muldrotha, the Gravetide
+1 Otawara, Soaring City
+1 Overgrown Tomb
+1 Oversold Cemetery
+1 Palantír of Orthanc
+1 Phyrexian Reclamation
+1 Prismatic Vista
+1 Psychic Frog
+1 Ramunap Excavator
+1 Rejuvenating Springs
+1 Sakura-Tribe Elder
+1 Sidisi, Brood Tyrant
+1 Six
+1 Sol Ring
+1 Splendid Reclamation
+1 Stitcher's Supplier
+1 Sunken Hollow
+4 Swamp
+1 Swan Song
+1 Sylvan Library
+1 Tear Asunder
+1 Terramorphic Expanse
+1 Teval's Judgment
+1 The Gitrog Monster
+1 The Scarab God
+1 Three Visits
+1 Titania, Protector of Argoth
+1 Tooth and Nail
+1 Tortured Existence
+1 Toxic Deluge
+1 Undergrowth Stadium
+1 Unmarked Grave
+1 Verdant Catacombs
+1 Victimize
+1 Watery Grave
+1 Wight of the Reliquary
+1 Wonder
+1 Woodland Cemetery
+1 World Shaper
+
+SIDEBOARD:
+1 Bloodchief Ascension
+1 Contaminated Aquifer
+1 Crawling Sensation
+1 Crypt of Agadeem
+1 Hedge Shredder
+1 Insidious Roots
+1 Kotis, Sibsig Champion
+1 Lost Monarch of Ifnir
+1 Memorial to Folly
+1 Myriad Landscape
+1 Ob Nixilis, the Fallen
+1 Opulent Palace
+1 Reassembling Skeleton
+1 River Kelpie
+1 Skull Prophet
+1 Steward of the Harvest
+1 Tasigur, the Golden Fang
+1 Will of the Sultai
+
+1 Teval, the Balanced Scale

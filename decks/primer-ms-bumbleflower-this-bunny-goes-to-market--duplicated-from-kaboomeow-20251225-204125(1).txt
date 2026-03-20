@@ -1,0 +1,96 @@
+1 Adarkar Wastes
+1 Aetherize
+1 An Offer You Can't Refuse
+1 Arcane Signet
+1 Auroral Procession
+1 Beast Within
+1 Bender's Waterskin
+1 Brainstorm
+1 Branchloft Pathway
+1 Brazen Borrower
+1 Breeding Pool
+1 Brushland
+1 Comeuppance
+1 Command Tower
+1 Consider
+1 Consult the Star Charts
+1 Dawn Charm
+1 Demolition Field
+1 Deserted Beach
+1 Dreamroot Cascade
+1 Dress Down
+1 Duelist's Heritage
+1 Dusk Legion Duelist
+1 Eiganjo, Seat of the Empire
+1 Esper Sentinel
+1 Exotic Orchard
+1 Fabled Passage
+1 Faerie Mastermind
+1 Farseek
+1 Fathom Mage
+1 Flooded Strand
+1 Floodfarm Verge
+2 Forest
+1 Fractured Identity
+1 Frantic Search
+1 Freestrider Lookout
+1 Galadriel's Dismissal
+1 Generous Gift
+1 Generous Patron
+1 Gitaxian Probe
+1 Glacial Fortress
+1 Growth Spiral
+1 Hallowed Fountain
+1 Hardbristle Bandit
+1 Hengegate Pathway
+1 Heroic Intervention
+1 Hinterland Harbor
+1 Hushwood Verge
+1 Hydroelectric Specimen
+1 Incubation Druid
+4 Island
+1 Jolrael, Mwonvuli Recluse
+1 Ledger Shredder
+1 Lion Sash
+1 Long River's Pull
+1 Misleading Signpost
+1 Misty Rainforest
+1 Nature's Lore
+1 Opt
+1 Overgrown Farmland
+1 Paradise Chocobo
+1 Path to Exile
+2 Plains
+1 Planar Genesis
+1 Pongify
+1 Promise of Loyalty
+1 Reliquary Tower
+1 Reprieve
+1 Rewind
+1 Riot Control
+1 Shrieking Drake
+1 Sin, Unending Cataclysm
+1 Sink into Stupor
+1 Smuggler's Share
+1 Snap
+1 Snapcaster Mage
+1 Sol Ring
+1 Spara's Headquarters
+1 Sunpetal Grove
+1 Swords to Plowshares
+1 Tataru Taru
+1 Temple Garden
+1 Three Visits
+1 Tishana's Tidebinder
+1 Tragic Arrogance
+1 Ty Lee, Chi Blocker
+1 Unwind
+1 Whitemane Lion
+1 Wild Rose Rebellion
+1 Willbreaker
+1 Windswept Heath
+1 Witch Enchanter
+1 Yavimaya Coast
+1 Yavimaya, Cradle of Growth
+
+1 Ms. Bumbleflower
