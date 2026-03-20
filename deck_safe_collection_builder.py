@@ -150,12 +150,308 @@ def clean_deck_name(filename):
 
 
 # ============================================================
+# GOOGLE SHEETS ADAPTER
+# ============================================================
+class _ColumnDim:
+    def __init__(self):
+        self.width = None
+
+class _ColumnDims:
+    def __init__(self):
+        self._dims = {}
+    def __getitem__(self, key):
+        if key not in self._dims:
+            self._dims[key] = _ColumnDim()
+        return self._dims[key]
+
+class _SheetProps:
+    def __init__(self):
+        self.tabColor = None
+
+def _col_letter_to_num(letter):
+    result = 0
+    for ch in letter.upper():
+        result = result * 26 + (ord(ch) - ord('A') + 1)
+    return result
+
+def _parse_cell_ref(ref):
+    m = re.match(r'^([A-Z]+)(\d+)$', ref.upper())
+    if not m:
+        raise ValueError(f"Invalid cell reference: {ref}")
+    return int(m.group(2)), _col_letter_to_num(m.group(1))
+
+
+class GCell:
+    def __init__(self, row, col, value=None):
+        self.row = row
+        self.col = col
+        self.value = value
+        self.font = None
+        self.fill = None
+        self.alignment = None
+        self.number_format = None
+
+
+class GWorksheet:
+    def __init__(self, title):
+        self.title = title
+        self.cells = {}
+        self.column_dimensions = _ColumnDims()
+        self._freeze_panes = None
+        self._merges = []
+        self.sheet_properties = _SheetProps()
+
+    def cell(self, row, column, value=None):
+        key = (row, column)
+        if key not in self.cells:
+            self.cells[key] = GCell(row, column)
+        c = self.cells[key]
+        if value is not None:
+            c.value = value
+        return c
+
+    def __getitem__(self, ref):
+        row, col = _parse_cell_ref(ref)
+        return self.cell(row, col)
+
+    def __setitem__(self, ref, value):
+        row, col = _parse_cell_ref(ref)
+        self.cell(row, col, value)
+
+    @property
+    def freeze_panes(self):
+        return self._freeze_panes
+
+    @freeze_panes.setter
+    def freeze_panes(self, value):
+        self._freeze_panes = value
+
+    def merge_cells(self, range_string):
+        self._merges.append(range_string)
+
+
+class GWorkbook:
+    def __init__(self):
+        self._sheets = []
+        self._active = GWorksheet("Sheet1")
+        self._sheets.append(self._active)
+
+    @property
+    def active(self):
+        return self._active
+
+    def create_sheet(self, title):
+        ws = GWorksheet(title)
+        self._sheets.append(ws)
+        return ws
+
+    def flush_to_google(self, spreadsheet):
+        from gspread.utils import a1_range_to_grid_range
+        from gspread_formatting import CellFormat, Color, TextFormat, NumberFormat
+        import gspread_formatting.batch_update_requests as bur
+
+        def hex_to_color(h):
+            h = h.lstrip('#')
+            if len(h) == 6:
+                return Color(int(h[0:2], 16) / 255, int(h[2:4], 16) / 255, int(h[4:6], 16) / 255)
+            return Color(0, 0, 0)
+
+        def translate_font(font):
+            if font is None:
+                return {}
+            kwargs = {}
+            if font.bold:
+                kwargs['bold'] = True
+            if font.italic:
+                kwargs['italic'] = True
+            if font.color and font.color.rgb and font.color.rgb != '00000000':
+                rgb = font.color.rgb
+                if len(rgb) == 8:
+                    rgb = rgb[2:]  # strip alpha
+                kwargs['foregroundColor'] = hex_to_color(rgb)
+            if font.name:
+                kwargs['fontFamily'] = font.name
+            if font.size:
+                kwargs['fontSize'] = font.size
+            if kwargs:
+                return {'textFormat': TextFormat(**kwargs)}
+            return {}
+
+        def translate_fill(fill):
+            if fill is None or fill.fill_type is None:
+                return {}
+            fg = fill.fgColor
+            if fg and fg.rgb and fg.rgb != '00000000':
+                rgb = fg.rgb
+                if len(rgb) == 8:
+                    rgb = rgb[2:]
+                return {'backgroundColor': hex_to_color(rgb)}
+            return {}
+
+        def translate_alignment(alignment):
+            if alignment is None:
+                return {}
+            kwargs = {}
+            if alignment.horizontal:
+                kwargs['horizontalAlignment'] = alignment.horizontal.upper()
+            if hasattr(alignment, 'text_rotation') and alignment.text_rotation:
+                kwargs['textRotation'] = {'angle': alignment.text_rotation}
+            return kwargs
+
+        def translate_number_format(nf):
+            if nf is None or nf == 'General':
+                return {}
+            nf_type = 'NUMBER'
+            if '%' in nf:
+                nf_type = 'PERCENT'
+            return {'numberFormat': NumberFormat(type=nf_type, pattern=nf)}
+
+        # ── Phase 1: Sheet structure ──────────────────────────────────────────
+        existing = spreadsheet.worksheets()
+        existing_titles = {ws.title for ws in existing}
+
+        for i, gws in enumerate(self._sheets):
+            if i == 0:
+                if existing[0].title != gws.title:
+                    existing[0].update_title(gws.title)
+            elif gws.title not in existing_titles:
+                spreadsheet.add_worksheet(title=gws.title, rows=1000, cols=26)
+
+        our_titles = {gws.title for gws in self._sheets}
+        refreshed = spreadsheet.worksheets()
+        for ws in refreshed:
+            if ws.title not in our_titles and len(refreshed) > 1:
+                spreadsheet.del_worksheet(ws)
+
+        ws_cache = {ws.title: ws for ws in spreadsheet.worksheets()}
+
+        # ── Phase 2: Clear all sheets in one call ─────────────────────────────
+        sheets_with_data = [gws for gws in self._sheets if gws.cells]
+        if sheets_with_data:
+            spreadsheet.values_batch_clear(
+                body={'ranges': [gws.title for gws in sheets_with_data]}
+            )
+
+        # ── Phase 3: Write all values in one call ─────────────────────────────
+        value_ranges = []
+        sheet_bounds = {}  # title → (max_row, max_col)
+        for gws in sheets_with_data:
+            max_row = max(r for r, c in gws.cells.keys())
+            max_col = max(c for r, c in gws.cells.keys())
+            sheet_bounds[gws.title] = (max_row, max_col)
+            values = [
+                [
+                    (gws.cells[(r, c)].value if (r, c) in gws.cells and gws.cells[(r, c)].value is not None else '')
+                    for c in range(1, max_col + 1)
+                ]
+                for r in range(1, max_row + 1)
+            ]
+            value_ranges.append({
+                'range': f"'{gws.title}'!A1:{get_column_letter(max_col)}{max_row}",
+                'values': values,
+            })
+
+        if value_ranges:
+            spreadsheet.values_batch_update(body={
+                'data': value_ranges,
+                'valueInputOption': 'RAW',
+            })
+
+        # ── Phase 4: All formatting in one batch_update ───────────────────────
+        all_requests = []
+        for gws in sheets_with_data:
+            ws = ws_cache[gws.title]
+            max_row, max_col = sheet_bounds[gws.title]
+
+            # Resize if needed
+            if max_row > ws.row_count or max_col > ws.col_count:
+                all_requests.append({
+                    'updateSheetProperties': {
+                        'properties': {
+                            'sheetId': ws.id,
+                            'gridProperties': {
+                                'rowCount': max(max_row, ws.row_count),
+                                'columnCount': max(max_col, ws.col_count),
+                            },
+                        },
+                        'fields': 'gridProperties.rowCount,gridProperties.columnCount',
+                    }
+                })
+
+            # Cell formatting
+            fmt_ranges = []
+            for (r, c), cell in gws.cells.items():
+                fmt_kwargs = {}
+                if cell.font:
+                    fmt_kwargs.update(translate_font(cell.font))
+                if cell.fill:
+                    fmt_kwargs.update(translate_fill(cell.fill))
+                if cell.alignment:
+                    fmt_kwargs.update(translate_alignment(cell.alignment))
+                if cell.number_format:
+                    fmt_kwargs.update(translate_number_format(cell.number_format))
+                if fmt_kwargs:
+                    fmt_ranges.append((f'{get_column_letter(c)}{r}', CellFormat(**fmt_kwargs)))
+            if fmt_ranges:
+                all_requests.extend(bur.format_cell_ranges(ws, fmt_ranges))
+
+            # Merges
+            for merge_range in gws._merges:
+                all_requests.append({
+                    'mergeCells': {
+                        'mergeType': 'MERGE_ALL',
+                        'range': a1_range_to_grid_range(merge_range, ws.id),
+                    }
+                })
+
+            # Frozen panes
+            if gws._freeze_panes:
+                fp_row, fp_col = _parse_cell_ref(gws._freeze_panes)
+                freeze_kwargs = {}
+                if fp_row > 1:
+                    freeze_kwargs['rows'] = fp_row - 1
+                if fp_col > 1:
+                    freeze_kwargs['cols'] = fp_col - 1
+                if freeze_kwargs:
+                    all_requests.extend(bur.set_frozen(ws, **freeze_kwargs))
+
+            # Column widths (all columns for this sheet in one extend)
+            col_widths = [
+                (col, int(dim.width * 7))
+                for col, dim in gws.column_dimensions._dims.items()
+                if dim.width
+            ]
+            if col_widths:
+                all_requests.extend(bur.set_column_widths(ws, col_widths))
+
+            # Tab color
+            if gws.sheet_properties.tabColor:
+                color = hex_to_color(gws.sheet_properties.tabColor)
+                all_requests.append({
+                    'updateSheetProperties': {
+                        'properties': {
+                            'sheetId': ws.id,
+                            'tabColor': {
+                                'red': color.red or 0,
+                                'green': color.green or 0,
+                                'blue': color.blue or 0,
+                            },
+                        },
+                        'fields': 'tabColor',
+                    }
+                })
+
+        if all_requests:
+            spreadsheet.batch_update({'requests': all_requests})
+
+
+# ============================================================
 # SPREADSHEET BUILDING
 # ============================================================
 def build_spreadsheet(collection_raw, collection, decks, considering, commanders,
                       deck_names_raw, deck_display, resolved_demand, resolve_cache,
-                      csv_basename, output_path):
-    wb = Workbook()
+                      csv_basename, output_path, workbook=None):
+    wb = workbook or Workbook()
     HF = PatternFill('solid', fgColor='4472C4')
     HN = Font(bold=True, color='FFFFFF', name='Arial', size=10)
     NF = Font(name='Arial', size=10)
@@ -373,8 +669,54 @@ def build_spreadsheet(collection_raw, collection, decks, considering, commanders
         ws_d.column_dimensions['C'].width = 10; ws_d.column_dimensions['D'].width = 30; ws_d.column_dimensions['E'].width = 14
         ws_d.freeze_panes = 'A2'
 
-    wb.save(output_path)
-    return missing, shared
+    if output_path and hasattr(wb, 'save'):
+        wb.save(output_path)
+    return missing, shared, wb
+
+
+# ============================================================
+# GOOGLE SHEETS UPLOAD
+# ============================================================
+SHEET_ID_FILE = os.path.join(os.path.dirname(os.path.abspath(__file__)), '.deck_safe_sheet_id')
+
+
+def _load_cached_sheet_id():
+    if os.path.exists(SHEET_ID_FILE):
+        return open(SHEET_ID_FILE).read().strip()
+    return None
+
+
+def _save_cached_sheet_id(sheet_id):
+    with open(SHEET_ID_FILE, 'w') as f:
+        f.write(sheet_id)
+
+
+def upload_to_google_sheets(gwb, sheet_name):
+    import gspread
+
+    gc = gspread.oauth()
+
+    spreadsheet = None
+    sheet_id = _load_cached_sheet_id()
+
+    if sheet_id:
+        try:
+            spreadsheet = gc.open_by_key(sheet_id)
+        except gspread.exceptions.SpreadsheetNotFound:
+            spreadsheet = None
+
+    if not spreadsheet:
+        try:
+            spreadsheet = gc.open(sheet_name)
+        except gspread.exceptions.SpreadsheetNotFound:
+            spreadsheet = gc.create(sheet_name)
+            print(f"  Created new Google Sheet: {sheet_name}")
+
+    _save_cached_sheet_id(spreadsheet.id)
+
+    print(f"  Uploading to Google Sheets...")
+    gwb.flush_to_google(spreadsheet)
+    print(f"  Google Sheets: {spreadsheet.url}")
 
 
 # ============================================================
@@ -385,7 +727,9 @@ def main():
     parser.add_argument('csv', help='Path to Moxfield CSV haves export')
     parser.add_argument('decks', nargs='*', help='Deck .txt files')
     parser.add_argument('--deck-dir', '-d', help='Directory containing deck .txt files')
-    parser.add_argument('-o', '--output', default='deck_safe_collection.xlsx', help='Output xlsx path')
+    parser.add_argument('-o', '--output', default=None, help='Output xlsx path (local file)')
+    parser.add_argument('--no-google', action='store_true', help='Skip Google Sheets upload')
+    parser.add_argument('--sheet-name', default='Deck-Safe Collection', help='Google Sheets document name')
     args = parser.parse_args()
 
     # Gather deck files
@@ -401,7 +745,10 @@ def main():
 
     print(f"Collection: {args.csv}")
     print(f"Decks: {len(deck_files)} files")
-    print(f"Output: {args.output}")
+    if args.output:
+        print(f"Output: {args.output}")
+    if not args.no_google:
+        print(f"Google Sheet: {args.sheet_name}")
     print()
 
     # Parse collection
@@ -447,17 +794,27 @@ def main():
     # Build spreadsheet
     deck_names_raw = sorted(decks.keys())
     deck_display = {n: clean_deck_name(n + '.txt') for n in deck_names_raw}
+    build_args = (collection_raw, collection, decks, considering_all, commanders,
+                  deck_names_raw, deck_display, dict(resolved_demand), resolve_cache,
+                  os.path.basename(args.csv))
 
-    missing, shared = build_spreadsheet(
-        collection_raw, collection, decks, considering_all, commanders,
-        deck_names_raw, deck_display, dict(resolved_demand), resolve_cache,
-        os.path.basename(args.csv), args.output
-    )
+    # Local .xlsx output
+    if args.output:
+        missing, shared, _ = build_spreadsheet(*build_args, output_path=args.output)
+        print(f"\n  Saved to {args.output}")
+    else:
+        missing = sum(1 for v in resolved_demand.values() if v['surplus'] < 0)
+        shared = sum(1 for v in resolved_demand.values() if len(v['decks']) > 1)
+
+    # Google Sheets upload
+    if not args.no_google:
+        gwb = GWorkbook()
+        build_spreadsheet(*build_args, output_path=None, workbook=gwb)
+        upload_to_google_sheets(gwb, args.sheet_name)
 
     print(f"\n{'='*50}")
     print(f"  {len(decks)} decks, {len(resolved_demand)} unique cards")
     print(f"  {missing} missing, {shared} shared")
-    print(f"  Saved to {args.output}")
     print(f"{'='*50}")
 
 
