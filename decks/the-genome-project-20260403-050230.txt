@@ -1,3 +1,4 @@
+1 Aetherflux Reservoir
 1 Arcane Signet
 1 Arid Mesa
 1 Bayo, Irritable Instructor
@@ -6,9 +7,11 @@
 1 Black Mage's Rod
 1 Black Market Connections
 1 Black Waltz No. 3
+1 Blasphemous Act
 1 Blazemire Verge
 1 Blood Crypt
 1 Bloodstained Mire
+1 Bonus Round
 1 Chaos Warp
 1 Circle of Power
 1 City on Fire
@@ -24,6 +27,7 @@
 1 Dragonskull Summit
 1 Emergence Zone
 1 Ensnared by the Mara
+1 Exsanguinate
 1 Faithless Looting
 1 Fellwar Stone
 1 Fire Covenant
@@ -31,6 +35,7 @@
 1 Harmonic Prodigy
 1 Haunted Ridge
 1 Highway Robbery
+1 Imp's Mischief
 1 Jeska's Will
 1 Kaya's Ghostform
 1 Light Up the Stage
@@ -44,9 +49,11 @@
 1 Midgar, City of Mako
 8 Mountain
 1 Necropotence
+1 Neheb, the Eternal
 1 Night's Whisper
 1 Not Dead After All
 1 Overmaster
+1 Peer into the Abyss
 1 Phyrexian Tower
 1 Polluted Delta
 1 Price of Progress
@@ -59,6 +66,7 @@
 1 Ruby Medallion
 1 Saw in Half
 1 Scalding Tarn
+1 Shatterskull Smashing
 1 Sign in Blood
 1 Smoldering Marsh
 1 Snuff Out

@@ -1,0 +1,97 @@
+1 Adamantium Bonding Tank
+1 Agent Frank Horrigan
+1 Altar of the Brood
+1 An Offer You Can't Refuse
+1 Arcane Signet
+1 Assassin's Trophy
+1 Basking Broodscale
+1 Beast Within
+1 Birds of Paradise
+1 Bloatfly Swarm
+1 Bloodbender's Rise
+1 Bloom Tender
+1 Bojuka Bog
+1 Boseiju, Who Endures
+1 Branching Evolution
+1 Breeding Pool
+1 Champion of Lambholt
+1 Command Tower
+1 Contagion Clasp
+1 Contagion Engine
+1 Counterspell
+1 Cyclonic Rift
+1 Deepglow Skate
+1 Drown in the Loch
+1 Drowned Catacomb
+1 Evolution Sage
+1 Exotic Orchard
+1 Farseek
+1 Fathom Mage
+1 Fierce Guardianship
+1 Flux Channeler
+3 Forest
+1 Generous Patron
+1 Glowing One
+1 Guardian Project
+1 Hardened Scales
+1 Hedge Maze
+1 Herd Baloth
+1 Heroic Intervention
+1 Hinterland Harbor
+1 Humongous Fungus
+1 Incubation Druid
+1 Inexorable Tide
+1 Inspiring Call
+1 Iridescent Hornbeetle
+2 Island
+1 Kami of Whispered Hopes
+1 Karn's Bastion
+1 Kodama of the West Tree
+1 Mariposa Military Base
+1 Mindcrank
+1 Misty Rainforest
+1 Morphic Pool
+1 Mothman Egg
+1 Nature's Lore
+1 Nesting Grounds
+1 Nuclear Fallout
+1 Nurturing Peatland
+1 Ouroboroid
+1 Overgrown Tomb
+1 Polluted Delta
+1 Pongify
+1 Psychic Corrosion
+1 Reflecting Pool
+1 Regrowth
+1 Rejuvenating Springs
+1 Rishkar, Peema Renegade
+1 Ruin Crab
+1 Seedborn Muse
+1 Shifting Woodland
+1 Simic Ascendancy
+1 Sol Ring
+2 Swamp
+1 Swan Song
+1 Swiftfoot Boots
+1 Takenuma, Abandoned Mire
+1 Tato Farmer
+1 Tekuthal, Inquiry Dominus
+1 Tezzeret's Gambit
+1 Three Visits
+1 Thrummingbird
+1 Tidus's Brotherhood Sword
+1 Toxic Deluge
+1 Undergrowth Stadium
+1 Verdant Catacombs
+1 Vexing Radgull
+1 Viral Drake
+1 Walking Ballista
+1 Waterlogged Grove
+1 Watery Grave
+1 Willowrush Verge
+1 Winding Constrictor
+1 Woodland Cemetery
+1 Yavimaya, Cradle of Growth
+1 Zagoth Triome
+
+1 The Wise Mothman

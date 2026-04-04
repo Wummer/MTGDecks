@@ -41,7 +41,6 @@
 1 Goldspan Dragon
 1 Hallowed Fountain
 1 Inferno Titan
-1 Inspiring Overseer
 1 Inspiring Vantage
 5 Island
 1 Izzet Signet
@@ -56,6 +55,7 @@
 1 Narset's Reversal
 1 Panharmonicon
 1 Path to Exile
+1 Phelia, Exuberant Shepherd
 5 Plains
 1 Ponder
 1 Pongify
@@ -87,5 +87,8 @@
 1 Talisman of Progress
 1 Wall of Omens
 1 Zealous Conscripts
+
+SIDEBOARD:
+1 Inspiring Overseer
 
 1 Satya, Aetherflux Genius

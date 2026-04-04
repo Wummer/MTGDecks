@@ -3,3 +3,4 @@ token.json
 .deck_safe_sheet_id
 __pycache__/
 *.pyc
+decks/proxy/

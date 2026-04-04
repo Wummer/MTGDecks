@@ -25,13 +25,13 @@
 1 Feed the Swarm
 1 Fellwar Stone
 1 Flawless Maneuver
-1 Fleshbag Marauder
 1 Gemstone Caverns
 1 Generous Gift
 1 Giver of Runes
 1 Grand Abolisher
 1 Gravecrawler
 1 Gray Merchant of Asphodel
+1 K'rrik, Son of Yawgmoth
 1 Kokusho, the Evening Star
 1 Lightning Greaves
 1 Living Death
@@ -82,5 +82,8 @@
 1 Woe Strider
 1 Yahenni, Undying Partisan
 1 Zulaport Cutthroat
+
+SIDEBOARD:
+1 Fleshbag Marauder
 
 1 Teysa Karlov

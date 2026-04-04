@@ -25,7 +25,6 @@
 1 Feed the Swarm
 1 Fellwar Stone
 1 Fetid Pools
-1 Fleshbag Marauder
 1 Flooded Strand
 1 Gempalm Polluter
 1 Ghoulcaller Gisa
@@ -37,11 +36,11 @@
 1 Headless Rider
 1 Hordewing Skaab
 1 Kindred Discovery
-1 Lich Lord of Unx
 1 Lightning Greaves
 1 Liliana, Dreadhorde General
 1 Living Death
 1 Lord of the Accursed
+1 Lost Monarch of Ifnir
 1 Midnight Reaper
 1 Mind Stone
 1 Narfi, Betrayer King
@@ -74,10 +73,20 @@
 1 Unholy Grotto
 1 Urborg, Tomb of Yawgmoth
 1 Victimize
+1 Warren Soultrader
 1 Wayfarer's Bauble
 1 Wilhelt, the Rotcleaver
 1 Wonder
 1 Zombie Apocalypse
 1 Zombie Master
+
+SIDEBOARD:
+1 Dread Summons
+1 Dreadhorde Invasion
+1 Fleshbag Marauder
+1 Lich Lord of Unx
+1 Liliana, Death's Majesty
+1 Mindless Conscription
+1 Rot Hulk
 
 1 The Scarab God

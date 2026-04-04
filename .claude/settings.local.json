@@ -1,0 +1,10 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(grep -E \"\\\\.\\(py|txt|csv|md\\)$\")",
+      "Bash(python -c \"import ast; ast.parse\\(open\\('deck_safe_collection_builder.py'\\).read\\(\\)\\); print\\('Syntax OK'\\)\")",
+      "Bash(python deck_safe_collection_builder.py moxfield_haves_2026-04-04-0804Z.csv --deck-dir ./decks/ -o test_output.xlsx --no-google)",
+      "Bash(python -c ':*)"
+    ]
+  }
+}

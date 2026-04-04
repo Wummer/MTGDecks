@@ -1,0 +1,93 @@
+1 Animate Dead
+1 Arcane Signet
+1 Beast Within
+1 Birds of Paradise
+1 Birthing Pod
+1 Boseiju, Who Endures
+1 Breeding Pool
+1 Buried Alive
+1 Carpet of Flowers
+1 Chord of Calling
+1 City of Brass
+1 Command Tower
+1 Counterspell
+1 Cyclonic Rift
+1 Deadly Rollick
+1 Defense of the Heart
+1 Displacer Kitten
+1 Dovin's Veto
+1 Dread Return
+1 Eiganjo, Seat of the Empire
+1 Eladamri's Call
+1 Elesh Norn, Mother of Machines
+1 Entomb
+1 Ephemerate
+1 Eternal Witness
+1 Exotic Orchard
+1 Farseek
+1 Fauna Shaman
+1 Fierce Guardianship
+1 Finale of Devastation
+1 Flawless Maneuver
+1 Flooded Strand
+1 Force of Negation
+3 Forest
+1 Generous Gift
+1 Ghostly Flicker
+1 Glen Elendra Archmage
+1 Godless Shrine
+1 Grand Abolisher
+1 Hallowed Fountain
+1 Heroic Intervention
+1 Indatha Triome
+3 Island
+1 Karmic Guide
+1 Lightning Greaves
+1 Living Death
+1 Mana Drain
+1 Marsh Flats
+1 Misty Rainforest
+1 Morphic Pool
+1 Nature's Lore
+1 Necromancy
+1 Otawara, Soaring City
+1 Overgrown Tomb
+1 Panharmonicon
+1 Path to Exile
+1 Persist
+1 Phyrexian Tower
+4 Plains
+1 Polluted Delta
+1 Ranger-Captain of Eos
+1 Razaketh, the Foulblooded
+1 Reanimate
+1 Reflecting Pool
+1 Rejuvenating Springs
+1 Restoration Angel
+1 Reveillark
+1 Sakura-Tribe Elder
+1 Seedborn Muse
+1 Sidisi, Undead Vizier
+1 Sol Ring
+1 Soulherder
+1 Sun Titan
+2 Swamp
+1 Swan Song
+1 Swords to Plowshares
+1 Teferi, Time Raveler
+1 Temple Garden
+1 Thassa, Deep-Dwelling
+1 Three Visits
+1 Toxic Deluge
+1 Undergrowth Stadium
+1 Vault of Champions
+1 Veil of Summer
+1 Verdant Catacombs
+1 Victimize
+1 Vilis, Broker of Blood
+1 Watery Grave
+1 Windswept Heath
+1 Yavimaya, Cradle of Growth
+1 Zagoth Triome
+
+1 Atraxa, Grand Unifier

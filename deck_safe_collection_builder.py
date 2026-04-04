@@ -43,6 +43,12 @@ ALIASES = {
     "Wild Rose Rebellion": "Counterspell",
     "Paradise Chocobo": "Birds of Paradise",
     "Joo Dee, Public Servant": "Sakashima of a Thousand Faces",
+    "Expansion // Explosion": "Expansion/Explosion",
+    "Lady Octopus, Inspired Inventor": "Merata, Neuron Hacker",
+    "Find // Finality": "Find/Finality",
+    "Dawn Warriors' Legacy": "Mizzix's Mastery",
+    "Bayo, Irritable Instructor":"Electro, Assaulting Battery",
+
 }
 REVERSE_ALIASES = {v: k for k, v in ALIASES.items()}
 
@@ -446,11 +452,100 @@ class GWorkbook:
 
 
 # ============================================================
+# CONSIDERING DECKS ANALYSIS
+# ============================================================
+def compute_available_pool(collection, resolved_demand):
+    """Return {canonical_name: available_count} after existing decks claim their cards."""
+    available = {}
+    # Cards demanded by existing decks: available = max(0, surplus)
+    for cn, info in resolved_demand.items():
+        available[cn] = max(0, info['surplus'])
+    # Cards in collection not demanded by any existing deck: fully available
+    for card, count in collection.items():
+        cn = canonical_name(card)
+        if cn not in available:
+            available[cn] = max(available.get(cn, 0), count)
+    return available
+
+
+def compute_assembly_order(considering_decks, considering_commanders,
+                           available_pool, collection):
+    """Greedy allocation: pick highest-% completable deck, claim its cards, repeat."""
+    pool = dict(available_pool)
+    remaining = set(considering_decks.keys())
+    result = []
+
+    while remaining:
+        candidates = []
+        for deck_name in remaining:
+            cards = considering_decks[deck_name]
+            total = sum(cards.values())
+            have = 0
+            missing_cards = {}
+            for card, needed in cards.items():
+                cn = canonical_name(card)
+                avail = pool.get(cn, 0)
+                # Also check collection directly for cards not tracked in pool yet
+                if cn not in pool:
+                    avail = resolve_owned(card, collection)
+                    pool[cn] = avail
+                got = min(needed, avail)
+                have += got
+                if got < needed:
+                    missing_cards[card] = needed - got
+            pct = have / total if total > 0 else 0
+            candidates.append((pct, total - have, deck_name, have, total, missing_cards))
+
+        # Best: highest pct, then fewest missing, then alphabetical
+        candidates.sort(key=lambda x: (-x[0], x[1], x[2]))
+        _, _, deck_name, have, total, missing_cards = candidates[0]
+
+        # Claim cards from pool
+        for card, needed in considering_decks[deck_name].items():
+            cn = canonical_name(card)
+            claimed = min(needed, pool.get(cn, 0))
+            pool[cn] = pool.get(cn, 0) - claimed
+
+        result.append({
+            'name': deck_name,
+            'order': len(result) + 1,
+            'total': total,
+            'have': have,
+            'missing': total - have,
+            'pct': pct,
+            'missing_cards': missing_cards,
+            'commander': considering_commanders.get(deck_name, ''),
+        })
+        remaining.remove(deck_name)
+
+    return result
+
+
+def write_proxy_files(assembly_order, output_dir):
+    """Write one proxy .txt per considering deck with missing cards only."""
+    os.makedirs(output_dir, exist_ok=True)
+    written = []
+    for entry in assembly_order:
+        missing = entry['missing_cards']
+        if not missing:
+            continue
+        safe_name = clean_deck_name(entry['name'] + '.txt').lower().replace(' ', '-')
+        filepath = os.path.join(output_dir, f"{safe_name}-proxy.txt")
+        with open(filepath, 'w', encoding='utf-8') as f:
+            for card in sorted(missing.keys()):
+                f.write(f"{missing[card]} {card}\n")
+        written.append(filepath)
+    return written
+
+
+# ============================================================
 # SPREADSHEET BUILDING
 # ============================================================
-def build_spreadsheet(collection_raw, collection, decks, considering, commanders,
+def build_spreadsheet(collection_raw, collection, decks, maybeboard, commanders,
                       deck_names_raw, deck_display, resolved_demand, resolve_cache,
-                      csv_basename, output_path, workbook=None):
+                      csv_basename, output_path=None, workbook=None,
+                      considering_decks=None, considering_commanders=None,
+                      assembly_order=None, available_pool=None):
     wb = workbook or Workbook()
     HF = PatternFill('solid', fgColor='4472C4')
     HN = Font(bold=True, color='FFFFFF', name='Arial', size=10)
@@ -523,6 +618,25 @@ def build_spreadsheet(collection_raw, collection, decks, considering, commanders
     ws.column_dimensions['A'].width = 42; ws.column_dimensions['B'].width = 32
     ws.column_dimensions['C'].width = 10; ws.column_dimensions['D'].width = 10
     ws.column_dimensions['E'].width = 10; ws.column_dimensions['F'].width = 14
+
+    # Considering decks mini-summary on the Summary tab
+    if assembly_order:
+        row += 1
+        ws.cell(row=row, column=1, value="Considering Decks (Available After Existing Decks)").font = Font(bold=True, name='Arial', size=13, color='5B9BD5')
+        row += 1
+        hdr(ws, row, ["Deck", "Commander", "Cards", "Available", "Missing", "% Complete"])
+        row += 1
+        for entry in assembly_order:
+            display = clean_deck_name(entry['name'] + '.txt')
+            ws.cell(row=row, column=1, value=display).font = NF
+            ws.cell(row=row, column=2, value=entry['commander']).font = Font(name='Arial', size=10, italic=True)
+            for ci, val in [(3, entry['total']), (4, entry['have'])]:
+                ws.cell(row=row, column=ci, value=val).font = NF; ws.cell(row=row, column=ci).alignment = CTR
+            c = ws.cell(row=row, column=5, value=entry['missing']); c.font = RF if entry['missing'] > 0 else GF; c.alignment = CTR
+            c = ws.cell(row=row, column=6, value=entry['pct']); c.number_format = '0.0%'; c.font = NF; c.alignment = CTR
+            c.fill = GRN if entry['pct'] >= 1.0 else (YEL if entry['pct'] >= 0.9 else RED)
+            row += 1
+        ws.cell(row=row, column=1, value="See 'Assembly Order' tab for recommended build sequence").font = Font(name='Arial', size=9, italic=True, color='888888')
 
     # --- SHOPPING LIST ---
     ws2 = wb.create_sheet("Shopping List"); ws2.sheet_properties.tabColor = "FF0000"
@@ -613,14 +727,14 @@ def build_spreadsheet(collection_raw, collection, decks, considering, commanders
     ws5.column_dimensions['C'].width = 45; ws5.column_dimensions['D'].width = 10; ws5.column_dimensions['E'].width = 14
 
     # --- CONSIDERING ---
-    has_considering = {dn: cards for dn, cards in considering.items() if cards}
+    has_considering = {dn: cards for dn, cards in maybeboard.items() if cards}
     if has_considering:
         ws6 = wb.create_sheet("Considering (Maybeboard)"); ws6.sheet_properties.tabColor = "888888"
         hdr(ws6, 1, ["Card Name", "Deck", "In Collection?"])
         row = 2
         for dn in deck_names_raw:
             if dn not in has_considering: continue
-            for card in sorted(considering[dn].keys()):
+            for card in sorted(maybeboard[dn].keys()):
                 rc = resolve_cache.get(card, [card, 0])
                 ws6.cell(row=row, column=1, value=card).font = NF
                 ws6.cell(row=row, column=2, value=deck_display[dn]).font = NF
@@ -629,6 +743,113 @@ def build_spreadsheet(collection_raw, collection, decks, considering, commanders
                 c.font = GF if rc[1] > 0 else RF; c.fill = GRN if rc[1] > 0 else RED
                 row += 1
         ws6.column_dimensions['A'].width = 45; ws6.column_dimensions['B'].width = 42; ws6.column_dimensions['C'].width = 16
+
+    # --- CONSIDERING DECKS TABS ---
+    if considering_decks and assembly_order and available_pool is not None:
+        con_display = {n: clean_deck_name(n + '.txt') for n in considering_decks}
+
+        # Pre-compute per-deck overview stats (independent, before assembly claims)
+        overview_rows = []
+        for dn, cards in considering_decks.items():
+            total = sum(cards.values())
+            have = 0
+            for card, needed in cards.items():
+                cn = canonical_name(card)
+                avail = available_pool.get(cn, 0)
+                if cn not in available_pool:
+                    avail = resolve_owned(card, collection)
+                have += min(needed, avail)
+            overview_rows.append((con_display[dn], considering_commanders.get(dn, ''),
+                                  total, have, total - have,
+                                  have / total if total else 0))
+        overview_rows.sort(key=lambda x: -x[5])
+
+        # -- Considering Overview --
+        ws_co = wb.create_sheet("Considering Overview"); ws_co.sheet_properties.tabColor = "5B9BD5"
+        ws_co['A1'] = "Considering Decks \u2013 Overview"
+        ws_co['A1'].font = Font(bold=True, name='Arial', size=16, color='5B9BD5')
+        ws_co.merge_cells('A1:F1')
+        ws_co['A2'] = f"Cards available after existing {len(decks)} decks claim theirs"
+        ws_co['A2'].font = Font(name='Arial', size=10, italic=True, color='888888')
+        hdr(ws_co, 4, ["Deck", "Commander", "Cards", "Available", "Missing", "% Complete"])
+        row = 5
+        for display, cmd, total, have, miss, pct in overview_rows:
+            ws_co.cell(row=row, column=1, value=display).font = BF
+            ws_co.cell(row=row, column=2, value=cmd).font = Font(name='Arial', size=10, italic=True)
+            ws_co.cell(row=row, column=3, value=total).font = NF; ws_co.cell(row=row, column=3).alignment = CTR
+            ws_co.cell(row=row, column=4, value=have).font = NF; ws_co.cell(row=row, column=4).alignment = CTR
+            c = ws_co.cell(row=row, column=5, value=miss); c.font = RF if miss > 0 else GF; c.alignment = CTR
+            c.fill = RED if miss > 0 else GRN
+            c = ws_co.cell(row=row, column=6, value=pct); c.number_format = '0.0%'; c.alignment = CTR
+            if pct >= 0.9: c.font = GF; c.fill = GRN
+            elif pct >= 0.7: c.font = Font(name='Arial', size=10, color='CC8800', bold=True); c.fill = YEL
+            else: c.font = RF; c.fill = RED
+            row += 1
+        ws_co.column_dimensions['A'].width = 42; ws_co.column_dimensions['B'].width = 32
+        ws_co.column_dimensions['C'].width = 10; ws_co.column_dimensions['D'].width = 12
+        ws_co.column_dimensions['E'].width = 10; ws_co.column_dimensions['F'].width = 14
+        ws_co.freeze_panes = 'A5'
+
+        # -- Considering Shopping List --
+        # Aggregate missing cards across all considering decks from assembly order
+        shopping = defaultdict(lambda: {'need': 0, 'decks': []})
+        for entry in assembly_order:
+            for card, qty in entry['missing_cards'].items():
+                cn = canonical_name(card)
+                info = shopping[card]
+                info['need'] += qty
+                info['decks'].append(con_display[entry['name']])
+                info['cn'] = cn
+        if shopping:
+            ws_cs = wb.create_sheet("Considering Shopping"); ws_cs.sheet_properties.tabColor = "C00000"
+            hdr(ws_cs, 1, ["Card", "Copies Needed", "Owned", "Used by Existing", "Available", "Needed By"])
+            row = 2
+            for card in sorted(shopping.keys(), key=lambda c: (-shopping[c]['need'], c)):
+                info = shopping[card]
+                cn = info['cn']
+                owned = resolve_owned(cn, collection)
+                existing_demand = resolved_demand.get(cn, {}).get('total_demand', 0)
+                avail = max(0, owned - existing_demand)
+                ws_cs.cell(row=row, column=1, value=card).font = NF
+                c = ws_cs.cell(row=row, column=2, value=info['need']); c.font = RF; c.alignment = CTR
+                ws_cs.cell(row=row, column=3, value=owned).font = NF; ws_cs.cell(row=row, column=3).alignment = CTR
+                ws_cs.cell(row=row, column=4, value=existing_demand).font = NF; ws_cs.cell(row=row, column=4).alignment = CTR
+                ws_cs.cell(row=row, column=5, value=avail).font = NF; ws_cs.cell(row=row, column=5).alignment = CTR
+                ws_cs.cell(row=row, column=6, value=", ".join(info['decks'])).font = NF
+                row += 1
+            ws_cs.column_dimensions['A'].width = 42; ws_cs.column_dimensions['B'].width = 16
+            ws_cs.column_dimensions['C'].width = 10; ws_cs.column_dimensions['D'].width = 16
+            ws_cs.column_dimensions['E'].width = 12; ws_cs.column_dimensions['F'].width = 80
+            ws_cs.freeze_panes = 'A2'
+
+        # -- Assembly Order --
+        ws_ao = wb.create_sheet("Assembly Order"); ws_ao.sheet_properties.tabColor = "7030A0"
+        ws_ao['A1'] = "Considering Decks \u2013 Recommended Build Order"
+        ws_ao['A1'].font = Font(bold=True, name='Arial', size=16, color='7030A0')
+        ws_ao.merge_cells('A1:G1')
+        ws_ao['A2'] = "Greedy allocation: build the most-complete deck first, then re-evaluate"
+        ws_ao['A2'].font = Font(name='Arial', size=10, italic=True, color='888888')
+        hdr(ws_ao, 4, ["#", "Deck", "Commander", "Cards", "Available", "Missing", "% Complete"])
+        row = 5
+        for entry in assembly_order:
+            ws_ao.cell(row=row, column=1, value=f"#{entry['order']}").font = BF; ws_ao.cell(row=row, column=1).alignment = CTR
+            ws_ao.cell(row=row, column=2, value=con_display[entry['name']]).font = BF
+            ws_ao.cell(row=row, column=3, value=entry['commander']).font = Font(name='Arial', size=10, italic=True)
+            ws_ao.cell(row=row, column=4, value=entry['total']).font = NF; ws_ao.cell(row=row, column=4).alignment = CTR
+            ws_ao.cell(row=row, column=5, value=entry['have']).font = NF; ws_ao.cell(row=row, column=5).alignment = CTR
+            c = ws_ao.cell(row=row, column=6, value=entry['missing'])
+            c.font = RF if entry['missing'] > 0 else GF; c.alignment = CTR
+            c.fill = RED if entry['missing'] > 0 else GRN
+            c = ws_ao.cell(row=row, column=7, value=entry['pct']); c.number_format = '0.0%'; c.alignment = CTR
+            if entry['pct'] >= 0.9: c.font = GF; c.fill = GRN
+            elif entry['pct'] >= 0.7: c.font = Font(name='Arial', size=10, color='CC8800', bold=True); c.fill = YEL
+            else: c.font = RF; c.fill = RED
+            row += 1
+        ws_ao.column_dimensions['A'].width = 8; ws_ao.column_dimensions['B'].width = 42
+        ws_ao.column_dimensions['C'].width = 32; ws_ao.column_dimensions['D'].width = 10
+        ws_ao.column_dimensions['E'].width = 12; ws_ao.column_dimensions['F'].width = 10
+        ws_ao.column_dimensions['G'].width = 14
+        ws_ao.freeze_panes = 'A5'
 
     # --- PER-DECK TABS ---
     for dn in deck_names_raw:
@@ -730,6 +951,8 @@ def main():
     parser.add_argument('-o', '--output', default=None, help='Output xlsx path (local file)')
     parser.add_argument('--no-google', action='store_true', help='Skip Google Sheets upload')
     parser.add_argument('--sheet-name', default='Deck-Safe Collection', help='Google Sheets document name')
+    parser.add_argument('--no-proxy', action='store_true', help='Skip proxy file generation')
+    parser.add_argument('--proxy-dir', default=None, help='Directory for proxy .txt output')
     args = parser.parse_args()
 
     # Gather deck files
@@ -739,12 +962,26 @@ def main():
             if f.endswith('.txt'):
                 deck_files.append(os.path.join(args.deck_dir, f))
 
+    # Discover considering decks
+    considering_dir = None
+    considering_files = []
+    if args.deck_dir:
+        considering_dir = os.path.join(args.deck_dir, 'considering')
+        if os.path.isdir(considering_dir):
+            considering_files = sorted(
+                os.path.join(considering_dir, f)
+                for f in os.listdir(considering_dir)
+                if f.endswith('.txt')
+            )
+
     if not deck_files:
         print("ERROR: No deck files provided. Use positional args or --deck-dir")
         sys.exit(1)
 
     print(f"Collection: {args.csv}")
     print(f"Decks: {len(deck_files)} files")
+    if considering_files:
+        print(f"Considering: {len(considering_files)} files from {considering_dir}")
     if args.output:
         print(f"Output: {args.output}")
     if not args.no_google:
@@ -757,19 +994,32 @@ def main():
 
     # Parse decks
     decks = {}
-    considering_all = {}
+    maybeboard_all = {}
     commanders = {}
     for filepath in deck_files:
         filename = os.path.basename(filepath)
         deck_name = filename.replace('.txt', '')
         actual_deck, sb_cards, commander = parse_deck(filepath)
         decks[deck_name] = actual_deck
-        considering_all[deck_name] = sb_cards
+        maybeboard_all[deck_name] = sb_cards
         if commander:
             commanders[deck_name] = commander
         total = sum(actual_deck.values())
         sb_total = sum(sb_cards.values())
         print(f"  {clean_deck_name(filename)}: {total} cards + {sb_total} considering [{commander or '?'}]")
+
+    # Parse considering decks
+    considering_decks = {}
+    considering_commanders = {}
+    for filepath in considering_files:
+        filename = os.path.basename(filepath)
+        deck_name = filename.replace('.txt', '')
+        actual_deck, _, commander = parse_deck(filepath)
+        considering_decks[deck_name] = actual_deck
+        if commander:
+            considering_commanders[deck_name] = commander
+        total = sum(actual_deck.values())
+        print(f"  [Considering] {clean_deck_name(filename)}: {total} cards [{commander or '?'}]")
 
     # Calculate demand
     resolved_demand = defaultdict(lambda: {'total_demand': 0, 'owned': 0, 'decks': [], 'display_names': []})
@@ -787,20 +1037,35 @@ def main():
         info['surplus'] = info['owned'] - info['total_demand']
 
     resolve_cache = {}
-    for card in set(c for d in decks.values() for c in d) | set(c for d in considering_all.values() for c in d):
+    all_cards = set(c for d in decks.values() for c in d) | set(c for d in maybeboard_all.values() for c in d)
+    all_cards |= set(c for d in considering_decks.values() for c in d)
+    for card in all_cards:
         cn = canonical_name(card)
         resolve_cache[card] = [cn, resolve_owned(cn, collection)]
+
+    # Compute considering decks analysis
+    available_pool = compute_available_pool(collection, resolved_demand)
+    assembly_order = []
+    if considering_decks:
+        assembly_order = compute_assembly_order(
+            considering_decks, considering_commanders, available_pool, collection)
 
     # Build spreadsheet
     deck_names_raw = sorted(decks.keys())
     deck_display = {n: clean_deck_name(n + '.txt') for n in deck_names_raw}
-    build_args = (collection_raw, collection, decks, considering_all, commanders,
+    build_args = (collection_raw, collection, decks, maybeboard_all, commanders,
                   deck_names_raw, deck_display, dict(resolved_demand), resolve_cache,
                   os.path.basename(args.csv))
+    build_kwargs = {
+        'considering_decks': considering_decks,
+        'considering_commanders': considering_commanders,
+        'assembly_order': assembly_order,
+        'available_pool': available_pool,
+    }
 
     # Local .xlsx output
     if args.output:
-        missing, shared, _ = build_spreadsheet(*build_args, output_path=args.output)
+        missing, shared, _ = build_spreadsheet(*build_args, output_path=args.output, **build_kwargs)
         print(f"\n  Saved to {args.output}")
     else:
         missing = sum(1 for v in resolved_demand.values() if v['surplus'] < 0)
@@ -809,12 +1074,23 @@ def main():
     # Google Sheets upload
     if not args.no_google:
         gwb = GWorkbook()
-        build_spreadsheet(*build_args, output_path=None, workbook=gwb)
+        build_spreadsheet(*build_args, output_path=None, workbook=gwb, **build_kwargs)
         upload_to_google_sheets(gwb, args.sheet_name)
+
+    # Write proxy files
+    if considering_decks and not args.no_proxy:
+        proxy_dir = args.proxy_dir or (os.path.join(args.deck_dir, 'proxy') if args.deck_dir else 'proxy')
+        written = write_proxy_files(assembly_order, proxy_dir)
+        if written:
+            print(f"\n  Proxy files written to {proxy_dir}/:")
+            for p in written:
+                print(f"    {os.path.basename(p)}")
 
     print(f"\n{'='*50}")
     print(f"  {len(decks)} decks, {len(resolved_demand)} unique cards")
     print(f"  {missing} missing, {shared} shared")
+    if assembly_order:
+        print(f"  {len(considering_decks)} considering decks analyzed")
     print(f"{'='*50}")
 
 
